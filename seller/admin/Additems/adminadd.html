@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Product Management</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #2c3e50;
+      color: white;
+      min-height: 100vh;
+      padding: 20px;
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 30px;
+      font-size: 24px;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 10px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar ul li {
+      margin-bottom: 15px;
+    }
+
+    .sidebar ul li a {
+      color: #ecf0f1;
+      text-decoration: none;
+      display: block;
+      padding: 10px;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+
+    .sidebar ul li a:hover,
+    .sidebar ul li a.active {
+      background: #34495e;
+    }
+
+    .admin-container {
+      margin-left: 270px;
+      padding: 30px;
+      flex: 1;
+    }
+
+    .header {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      color: #7f8c8d;
+    }
+
+    .content-section {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    .content-section h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #3498db;
+    }
+
+    .product-form {
+      display: grid;
+      gap: 20px;
+      max-width: 600px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #2c3e50;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .checkbox-group input {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .btn {
+      padding: 12px 30px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-primary {
+      background: #3498db;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    .btn-warning {
+      background: #f39c12;
+      color: white;
+    }
+
+    .btn-warning:hover {
+      background: #e67e22;
+    }
+
+    .products-list {
+      display: grid;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .product-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 2px solid #e9ecef;
+      transition: all 0.3s;
+    }
+
+    .product-item:hover {
+      border-color: #3498db;
+      box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+    }
+
+    .product-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+
+    .product-info {
+      flex: 1;
+    }
+
+    .product-info h4 {
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+
+    .product-info p {
+      color: #7f8c8d;
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+
+    .product-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .product-actions button {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+
+    .badge-sale {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .badge-category {
+      background: #3498db;
+      color: white;
+    }
+
+    .alert {
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-left: 4px solid #3498db;
+    }
+
+    .stat-card h3 {
+      color: #7f8c8d;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    .stat-card p {
+      color: #2c3e50;
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .image-preview {
+      width: 200px;
+      height: 200px;
+      border: 2px dashed #ddd;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .image-preview img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .image-preview.empty {
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <h2>Admin Panel</h2>
+    <ul>
+      <li><a href="../dashboard.html">Dashboard</a></li>
+      <li><a href="adminadd.html" class="active">Product Management</a></li>
+      <li><a href="#">Orders</a></li>
+      <li><a href="#">Sales</a></li>
+      <li><a href="#">Settings</a></li>
+    </ul>
+  </div>
+
+  <div class="admin-container">
+    <div class="header">
+      <h1>Product Management</h1>
+      <p>Add, edit, and manage your product inventory</p>
+    </div>
+
+  
+
+    <div id="alertContainer"></div>
+
+    <div class="content-section">
+      <h2 id="formTitle">Add New Product</h2>
+<!--form data-->
+
+     <form method="POST"
+      action="/6thsemproject/seller/admin/Additems/add_product.php"
+      enctype="multipart/form-data"
+      id="productForm">
+
+       
+        <input type="hidden" id="productId">
+        <input type="hidden" id="editProductId">
+        
+        <div class="form-group">
+          <label for="productName">Product Name *</label>
+          <input type="text" id="productName" placeholder="Enter product name"name="productName" required>
+        </div>
+
+        <div class="form-group">
+          <label for="productPrice">Price (Rs./kg) *</label>
+          <input type="number" id="productPrice" name="productPrice" placeholder="Enter price" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+          <label for="productOldPrice">Old Price (Optional)</label>
+          <input type="number" id="productOldPrice" placeholder="Enter old price for sale items"name="productOldPrice" step="0.01">
+        </div>
+
+        <div class="form-group">
+          <label for="productCategory">Category *</label>
+          <select id="productCategory" name="productCategory" required>
+            <option value="">Select category</option>
+            <option value="dried-seeds">Dried Seeds</option>
+            <option value="spicy-masalas">Spicy Masalas</option>
+            <option value="herbs">Herbs</option>
+            <option value="blends">Spice Blends</option>
+          </select>
+        </div>
+
+  <div class="form-group">
+  <label for="productImage">Product Image *</label>
+  <input type="file" id="productImage" name="productImage" accept="image/*" required>
+
+  <div class="image-preview empty" id="imagePreview">
+    Image preview will appear here
+  </div>
+</div>
+
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="onSale" name="onSale">
+          <label for="onSale">This is a sale product</label>
+          <input type="checkbox" id="isCombo" name="isCombo">
+          <label for="isCombo" style="margin-left: 10px;">Combo Offer</label>
+          <input type="checkbox" id="Instock" name="Instock">
+          <label for="featured" style="margin-left: 10px;">In Stock</label>
+          
+        </div>
+        
+
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" class="btn btn-primary" id="submitBtn">Add Product</button>
+          <button type="button" class="btn btn-warning" id="CancelBtn;">Edit</button>
+        </div>
+
+      </form>
+    </div>
+    
+
+
+  
+<script>
+/* IMAGE PREVIEW */
+const imageInput = document.getElementById("productImage");
+const imagePreview = document.getElementById("imagePreview");
+
+if (imageInput && imagePreview) {
+    imageInput.addEventListener("change", function () {
+        const file = this.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                imagePreview.classList.remove("empty");
+                imagePreview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            imagePreview.classList.add("empty");
+            imagePreview.innerHTML = "Image preview will appear here";
+        }
+    });
+}
+
+/* SUCCESS MESSAGE AFTER SUBMIT */
+const productForm = document.getElementById("productForm");
+const alertContainer = document.getElementById("alertContainer");
+
+if (productForm && alertContainer) {
+    productForm.addEventListener("submit", function (e) {
+        // Optional: prevent actual submission (for testing UI)
+        // e.preventDefault();
+
+        alertContainer.innerHTML = `
+            <div class="alert alert-success">
+                ✅ Product added successfully!
+            </div>
+        `;
+    });
+}
+</script>
+<script>
+const params = new URLSearchParams(window.location.search);
+const alertContainer = document.getElementById("alertContainer");
+
+if (params.get("success") === "1") {
+    alertContainer.innerHTML = `
+        <div class="alert alert-success">
+            ✅ Product added successfully!
+        </div>
+    `;
+}
+</script>
+
+</body>
+</html>

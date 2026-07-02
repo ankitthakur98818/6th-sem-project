@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - The Spice Nepal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #121212;
+            --bg-card: #1e1e1e;
+            --bg-sidebar: #0a0a0a;
+            --primary: #d97706; /* Spice Orange */
+            --secondary: #06d9b6; /* Accent Cyan */
+            --success: #10b981;
+            --danger: #dc2626;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-col: #374151;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-body); color: var(--text-main); display: flex; min-height: 100vh; }
+        
+        /* Glass/Glow Effects */
+        .glass-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(217, 119, 6, 0.4);
+            box-shadow: 0 10px 15px -3px rgba(217, 119, 6, 0.15);
+        }
+
+        /* Sidebar */
+        .sidebar { width: 280px; background: var(--bg-sidebar); border-right: 1px solid var(--border-col); padding: 25px; position: fixed; height: 100vh; z-index: 10; }
+        .sidebar h2 { font-family: 'Outfit', sans-serif; font-size: 26px; font-weight: 700; color: white; display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+        .sidebar h2 i { color: var(--primary); }
+        .sidebar ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+        .sidebar ul li a { 
+            color: var(--text-muted); text-decoration: none; display: flex; align-items: center; 
+            padding: 14px 18px; border-radius: 12px; transition: all 0.3s ease; font-weight: 500;
+        }
+        .sidebar ul li a i { margin-right: 15px; font-size: 18px; width: 24px; text-align: center; }
+        .sidebar ul li a:hover, .sidebar ul li a.active { 
+            background: linear-gradient(90deg, rgba(217, 119, 6, 0.1) 0%, rgba(217, 119, 6, 0) 100%);
+            color: var(--primary); border-left: 3px solid var(--primary); 
+        }
+
+        /* Main Area */
+        .main-content { margin-left: 280px; flex: 1; padding: 40px; max-width: 1400px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .header h1 { font-family: 'Outfit', sans-serif; font-size: 32px; font-weight: 700; background: -webkit-linear-gradient(45deg, #fff, #9ca3af); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .user-info { display: flex; align-items: center; gap: 15px; background: var(--bg-card); padding: 10px 20px; border-radius: 30px; border: 1px solid var(--border-col); }
+        .user-info img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--primary); }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 40px; }
+        .stat-card { padding: 25px; display: flex; align-items: center; gap: 20px; position:relative; overflow:hidden;}
+        .stat-card::before { content: ''; position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); border-radius: 50%; transform: translate(30%, -30%); }
+        .stat-icon { width: 55px; height: 55px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; flex-shrink: 0; }
+        .stat-info h3 { font-size: 14px; font-weight: 500; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-info p { font-size: 28px; font-family: 'Outfit', sans-serif; font-weight: 700; color: white; }
+
+        /* Charts & AI Modules */
+        .middle-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 40px; }
+        .section-box { padding: 25px; }
+        .section-box h4 { font-family: 'Outfit', sans-serif; font-size: 18px; margin-bottom: 25px; color: white; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-col); padding-bottom: 15px; }
+        .section-box h4 i { color: var(--secondary); }
+        
+        /* AI Hub Specifics */
+        .ai-hub .status-row { display: flex; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px dashed var(--border-col); padding-bottom: 10px;}
+        .ai-hub .status-value { font-weight: 600; color: var(--secondary); }
+        .ai-pulse { display: inline-block; width: 8px; height: 8px; background: var(--secondary); border-radius: 50%; margin-right: 5px; box-shadow: 0 0 10px var(--secondary); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 217, 182, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(6, 217, 182, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(6, 217, 182, 0); } }
+
+        /* Tables */
+        .recent-orders { padding: 25px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; border-bottom: 2px solid var(--border-col); color: var(--text-muted); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 18px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 15px; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-pending { background: rgba(243, 156, 18, 0.15); color: #f39c12; border: 1px solid rgba(243, 156, 18, 0.3); }
+        .status-completed { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+
+        canvas { filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2><i class="fas fa-fire"></i> SpiceAdmin</h2>
+        <ul>
+            <li><a href="dashboard.html" class="active"><i class="fas fa-border-all"></i> Dashboard</a></li>
+            <li><a href="Additems/adminadd.html"><i class="fas fa-box-open"></i> Products</a></li>
+            <li><a href="Additems/orderpannel/admiorder.html"><i class="fas fa-shopping-bag"></i> Orders</a></li>
+            <li><a href="Additems/users.html"><i class="fas fa-users"></i> Customers</a></li>
+            <li><a href="Additems/Notifaction.html"><i class="fas fa-bell"></i> Notifications</a></li>
+            <li><a href="#"><i class="fas fa-cogs"></i> System Config</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h1>Business Overview</h1>
+            <div class="user-info">
+                <span>Admin Console</span>
+                <img src="../../img/logo_10.png" alt="Admin">
+            </div>
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <!-- Populated via JS -->
+        </div>
+
+        <div class="middle-grid">
+            <div class="glass-card section-box">
+                <h4><i class="fas fa-chart-line"></i> Revenue Trend (Last 7 Days)</h4>
+                <canvas id="salesChart" height="100"></canvas>
+            </div>
+            
+            <div class="glass-card section-box ai-hub">
+                <h4><i class="fas fa-brain"></i> Machine Learning Hub</h4>
+                <p style="color:var(--text-muted); font-size: 14px; margin-bottom: 20px; line-height:1.5;">
+                    Displays the offline status of Python Algorithms processing content-based recommendations and dynamic discounts.
+                </p>
+                <div id="aiStatusContainer">
+                    <div class="status-row">
+                        <span><i class="fas fa-network-wired" style="color:#8e44ad; width:20px;"></i> Recommender Status</span>
+                        <span class="status-value" id="aiStatusText"><span class="ai-pulse"></span> Analyzing Engine...</span>
+                    </div>
+                    <div class="status-row">
+                        <span><i class="fas fa-link" style="color:#e74c3c; width:20px;"></i> Data Pairs Generated</span>
+                        <span class="status-value" id="aiPairsCount">--</span>
+                    </div>
+                    <div class="status-row">
+                        <span><i class="fas fa-tag" style="color:#d97706; width:20px;"></i> Smart Discount Engine</span>
+                        <span class="status-value" style="color:var(--success);">V2 Loaded</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card recent-orders">
+            <h4><i class="fas fa-history"></i> Recent Transactions</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer Name</th>
+                        <th>Transaction Date</th>
+                        <th>Total Value</th>
+                        <th>Fulfillment Status</th>
+                    </tr>
+                </thead>
+                <tbody id="recentOrdersTable">
+                    <!-- Data populated by JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js dark mode defaults
+        Chart.defaults.color = '#9ca3af';
+        Chart.defaults.borderColor = '#374151';
+
+        document.addEventListener('DOMContentLoaded', fetchDashboardData);
+
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch('get_dashboard_stats.php');
+                const data = await response.json();
+
+                renderStats(data.stats);
+                if (data.sales_chart && data.sales_chart.length > 0) renderSalesChart(data.sales_chart);
+                renderRecentOrders(data.recent_orders);
+                renderAITools(data.ai_insights);
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        function renderStats(stats) {
+            const grid = document.getElementById('statsGrid');
+            const cards = [
+                { title: 'Total Revenue', value: 'Rs. ' + stats.revenue, icon: 'fa-money-bill-wave', color: 'linear-gradient(135deg, #059669, #10b981)' },
+                { title: 'Total Orders', value: stats.orders, icon: 'fa-shopping-cart', color: 'linear-gradient(135deg, #2563eb, #3b82f6)' },
+                { title: 'Store Products', value: stats.products, icon: 'fa-cube', color: 'linear-gradient(135deg, #d97706, #f59e0b)' },
+                { title: 'Registered Users', value: stats.users, icon: 'fa-user-ninja', color: 'linear-gradient(135deg, #7c3aed, #8b5cf6)' }
+            ];
+
+            grid.innerHTML = cards.map(card => `
+                <div class="glass-card stat-card">
+                    <div class="stat-icon" style="background: ${card.color}"><i class="fas ${card.icon}"></i></div>
+                    <div class="stat-info">
+                        <h3>${card.title}</h3>
+                        <p>${card.value}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSalesChart(chartData) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            
+            // Create Gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(217, 119, 6, 0.5)'); // primary color fade
+            gradient.addColorStop(1, 'rgba(217, 119, 6, 0.0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.map(d => d.date),
+                    datasets: [{
+                        label: 'Gross Revenue',
+                        data: chartData.map(d => d.amount),
+                        borderColor: '#d97706',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#18181b',
+                        pointBorderColor: '#d97706',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#374151' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function renderRecentOrders(orders) {
+            const tbody = document.getElementById('recentOrdersTable');
+            if(!orders || orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No recent orders found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td><strong style="color:var(--primary)">#ORD-${order.id}</strong></td>
+                    <td>${order.customer}</td>
+                    <td>${order.date}</td>
+                    <td style="font-weight:600;">Rs. ${order.total}</td>
+                    <td><span class="status-badge ${order.status === 'Completed' ? 'status-completed' : 'status-pending'}">${order.status || 'Pending'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAITools(ai_data) {
+            if(ai_data) {
+                let statusColor = ai_data.status === 'Active' ? 'var(--secondary)' : 'var(--danger)';
+                document.getElementById('aiStatusText').innerHTML = `<span class="ai-pulse" style="background:${statusColor}; box-shadow: 0 0 10px ${statusColor}"></span> Python Core ${ai_data.status}`;
+                document.getElementById('aiStatusText').style.color = statusColor;
+                document.getElementById('aiPairsCount').textContent = ai_data.paired_items;
+            }
+        }
+    </script>
+</body>
+</html>
